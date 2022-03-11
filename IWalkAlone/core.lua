@@ -63,6 +63,12 @@
           end
         end
 
+        CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
+
+        --These two may cause taint, I need to investigate this
+        CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
+        CompactRaidFrameManager.Hide = function() end
+
         IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
     end
 
@@ -141,18 +147,11 @@
 --CompactRaidFrameContainer:Show()
 --CompactRaidFrameManager:Show()
 
-    CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
-    CompactRaidFrameManager.Hide = function() end
 
 --CompactRaidFrameContainer.RealHide = CompactRaidFrameContainer.Hide
 --CompactRaidFrameContainer.Hide = function() end
 
 ----------------------------------
-
---================================
--- Errata 
---================================
-    CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
 
 --================================
 -- Slash Commands
