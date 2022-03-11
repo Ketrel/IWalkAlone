@@ -12,7 +12,7 @@
 ----------------------------------
 
 --================================
--- IWalkAlone Functions
+--= IWalkAlone Functions
 --================================
     local function IWA_sync()
         IWalkAlone = IWA.conf
@@ -109,7 +109,7 @@
 ----------------------------------
 
 --================================
--- Hooks, Secure and Otherwise
+--= Hooks, Secure and Otherwise
 --================================
 
 --local function postHookCompactRaidFrameContainer_OnEvent(self,event,...)
@@ -154,7 +154,7 @@
 ----------------------------------
 
 --================================
--- Slash Commands
+--= Slash Commands
 --================================
     SlashCmdList["TOGGLEMANAGER"] = IWA_toggleManager
     SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/iwa', '/toggleraidman', '/raidman'
