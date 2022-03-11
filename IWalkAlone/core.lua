@@ -12,6 +12,63 @@
 ----------------------------------
 
 --================================
+-- IWalkAlone Functions
+--================================
+    local function IWA_sync()
+        IWalkAlone = IWA.conf
+    end
+
+    function IWA_hideManager()
+        CompactRaidFrameManager:SetAlpha(0)
+        CompactRaidFrameManagerToggleButton:Hide()
+    end
+
+    function IWA_showManager()
+        CompactRaidFrameManager:SetAlpha(1)
+        CompactRaidFrameManagerToggleButton:Show()
+    end
+
+    local function IWA_toggleManager(msg, editBox, hc)
+        if CompactRaidFrameManager:GetAlpha() < 1 then
+            IWA.conf.showManager = true
+            IWA_showManager()
+            IWA_sync()
+        else
+            IWA.conf.showManager = false
+            IWA_hideManager()
+            IWA_sync()
+        end
+    end
+
+    local function IWA_init()
+        if IWalkAlone then
+            IWA.conf = IWalkAlone
+        else
+            IWA.conf = {
+                ["showManager"] = true,
+            }
+            IWA_sync()
+        end
+
+        if IWA.conf.showManager == false and IWA.getDAF() == nil then
+            IWA_hideManager()
+        end
+
+        function GetDisplayedAllyFrames()
+          local daf = IWA.getDAF()
+          if daf == 'party' or not daf then
+            return 'raid'
+          else
+            return daf
+          end
+        end
+
+        IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
+    end
+
+----------------------------------
+
+--================================
 --= Setup Events
 --================================
     local events = {}
@@ -42,64 +99,6 @@
     IWA.eventFrame:RegisterEvent("ADDON_LOADED")
 
     IWA.eventFrame:SetScript("OnEvent",eventHandler)
-
-----------------------------------
-
---================================
--- IWalkAlone Functions
---================================
-    local function IWA_init()
-        if IWalkAlone then
-            IWA.conf = IWalkAlone
-        else
-            IWA.conf = {
-                ["showManager"] = true,
-            }
-            IWA_sync()
-        end
-
-        if IWA.conf.showManager == false and IWA.getDAF() == nil then
-            IWA_hideManager()
-        end
-
-        function GetDisplayedAllyFrames()
-          local daf = IWA.getDAF()
-          if daf == 'party' or not daf then
-            return 'raid'
-          else
-            return daf
-          end
-        end
-
-        IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
-    end
-
-    local function IWA_sync()
-        IWalkAlone = IWA.conf
-    end
-
-    function IWA_hideManager()
-        CompactRaidFrameManager:SetAlpha(0)
-        CompactRaidFrameManagerToggleButton:Hide()
-    end
-
-    function IWA_showManager()
-        CompactRaidFrameManager:SetAlpha(1)
-        CompactRaidFrameManagerToggleButton:Show()
-    end
-
-    local function IWA_toggleManager(msg, editBox, hc)
-        if CompactRaidFrameManager:GetAlpha() < 1 then
-            IWA.conf.showManager = true
-            IWA_showManager()
-            IWA_sync()
-        else
-            IWA.conf.showManager = false
-            IWA_hideManager()
-            IWA_sync()
-        end
-    end
-
 
 ----------------------------------
 
@@ -159,4 +158,4 @@
 -- Slash Commands
 --================================
     SlashCmdList["TOGGLEMANAGER"] = IWA_toggleManager
-    SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/trman', '/toggleraidman', '/raidman'
+    SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/iwa', '/toggleraidman', '/raidman'
