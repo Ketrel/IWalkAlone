@@ -1,0 +1,10 @@
+package-as: IWalkAlone
+
+move-folders:
+    IWalkAlone/IWalkAlone: IWalkAlone
+
+ignore:
+    - README.md
+
+manual-changelog: CHANGELOG.md
+

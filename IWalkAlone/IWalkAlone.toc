@@ -1,0 +1,6 @@
+## Interface: 90200
+## Title: I Walk Alone
+## Author: Marq
+## Version: 1.0.0
+## SavedVariablesPerCharacter: IWalkAlone
+core.lua
