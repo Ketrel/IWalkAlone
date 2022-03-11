@@ -1,63 +1,111 @@
-local showManager = true
-local db = {}
+--================================
+--== Basic Addon Setup
+--================================
+    IWA = { -- main variable
+        ['conf']            = {},
+        ['eventFrame']      = CreateFrame("FRAME","IWA_EventFrame"),
+        ['events']          = {},
+        ['getDAF']          = GetDisplayedAllyFrames,
+    }
+    local db = {}
+
+----------------------------------
 
 --================================
+--= Setup Events
+--================================
+    local events = {}
 
-local eventFrame = CreateFrame("FRAME","IWA_EventFrame")
-local events = {}
-eventFrame:RegisterEvent("GROUP_JOINED")
-eventFrame:RegisterEvent("GROUP_LEFT")
-eventFrame:RegisterEvent("ADDON_LOADED")
+    function events:GROUP_JOINED()
+        IWA_showManager()
+    end
 
-local function IWA_sync()
-    IWA = db
-end
-
-local function eventHandler(self,event,...)
-	events[event](self,event,...)
-end
-	
-function events:GROUP_JOINED()
-    IWA_showManager()
-end
-
-function events:GROUP_LEFT()
-	if not db.showManager then
-        IWA_hideManager()
-	end
-end
-
-function events:ADDON_LOADED(...)
-    event, arg1 = ...
-    if arg1 == "IWalkAlone" then
-        if IWA then
-            db = IWA
-        else
-            db = {
-                ["showManager"] = true,
-            }
-        IWA_sync()
-        end
-        if db.showManager == false and IWA_getDAF() == nil then
+    function events:GROUP_LEFT()
+        if not IWA.conf.showManager then
             IWA_hideManager()
         end
     end
-    eventFrame:UnregisterEvent("ADDON_LOADED")
-end
 
-eventFrame:SetScript("OnEvent",eventHandler)
+    function events:ADDON_LOADED(...)
+        event, arg1 = ...
+        if arg1 == "IWalkAlone" then
+            IWA_init()
+        end
+    end
 
---=================================
+    local function eventHandler(self,event,...)
+        events[event](self,event,...)
+    end
 
-IWA_getDAF = GetDisplayedAllyFrames
-function GetDisplayedAllyFrames()
-  local daf = IWA_getDAF()
-  if daf == 'party' or not daf then
-    return 'raid'
-  else
-    return daf
-  end
-end
+    IWA.eventFrame:RegisterEvent("GROUP_JOINED")
+    IWA.eventFrame:RegisterEvent("GROUP_LEFT")
+    IWA.eventFrame:RegisterEvent("ADDON_LOADED")
+
+    IWA.eventFrame:SetScript("OnEvent",eventHandler)
+
+----------------------------------
+
+--================================
+-- IWalkAlone Functions
+--================================
+    local function IWA_init()
+        if IWalkAlone then
+            IWA.conf = IWalkAlone
+        else
+            IWA.conf = {
+                ["showManager"] = true,
+            }
+            IWA_sync()
+        end
+
+        if IWA.conf.showManager == false and IWA.getDAF() == nil then
+            IWA_hideManager()
+        end
+
+        function GetDisplayedAllyFrames()
+          local daf = IWA.getDAF()
+          if daf == 'party' or not daf then
+            return 'raid'
+          else
+            return daf
+          end
+        end
+
+        IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
+    end
+
+    local function IWA_sync()
+        IWalkAlone = IWA.conf
+    end
+
+    function IWA_hideManager()
+        CompactRaidFrameManager:SetAlpha(0)
+        CompactRaidFrameManagerToggleButton:Hide()
+    end
+
+    function IWA_showManager()
+        CompactRaidFrameManager:SetAlpha(1)
+        CompactRaidFrameManagerToggleButton:Show()
+    end
+
+    local function IWA_toggleManager(msg, editBox, hc)
+        if CompactRaidFrameManager:GetAlpha() < 1 then
+            IWA.conf.showManager = true
+            IWA_showManager()
+            IWA_sync()
+        else
+            IWA.conf.showManager = false
+            IWA_hideManager()
+            IWA_sync()
+        end
+    end
+
+
+----------------------------------
+
+--================================
+-- Hooks, Secure and Otherwise
+--================================
 
 --local function postHookCompactRaidFrameContainer_OnEvent(self,event,...)
 --    if not UnitAffectingCombat("player") then
@@ -91,44 +139,24 @@ end
 --    end
 --end
 
---=================================
-
 --CompactRaidFrameContainer:Show()
 --CompactRaidFrameManager:Show()
 
-CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
-CompactRaidFrameManager.Hide = function() end
+    CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
+    CompactRaidFrameManager.Hide = function() end
 
 --CompactRaidFrameContainer.RealHide = CompactRaidFrameContainer.Hide
 --CompactRaidFrameContainer.Hide = function() end
 
-CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
+----------------------------------
 
---=================================
+--================================
+-- Errata 
+--================================
+    CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
 
-function IWA_hideManager()
-    CompactRaidFrameManager:SetAlpha(0)
-    CompactRaidFrameManagerToggleButton:Hide()
-end
-
-function IWA_showManager()
-    CompactRaidFrameManager:SetAlpha(1)
-    CompactRaidFrameManagerToggleButton:Show()
-end
-
-local function toggleManager(msg, editBox, hc)
-	if CompactRaidFrameManager:GetAlpha() < 1 then
-		--showManager = 1
-        db.showManager = true
-        IWA_showManager()
-        IWA_sync()
-	else
-		--showManager = 0
-        db.showManager = false
-        IWA_hideManager()
-        IWA_sync()
-	end
-end
-
-SlashCmdList["TOGGLEMANAGER"] = toggleManager
-SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/trman', '/toggleraidman', '/raidman'
+--================================
+-- Slash Commands
+--================================
+    SlashCmdList["TOGGLEMANAGER"] = IWA_toggleManager
+    SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/trman', '/toggleraidman', '/raidman'
