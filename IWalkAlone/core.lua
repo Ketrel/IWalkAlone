@@ -14,6 +14,15 @@
 --================================
 --= IWalkAlone Functions
 --================================
+    local function IWA_GetDisplayedAllyFrames()
+        local daf = GetDisplayedAllyFrames()
+        if daf == 'party' or not daf then
+            return 'raid'
+        else
+            return daf
+        end
+    end
+
     local function IWA_sync()
         IWalkAlone = IWA.conf
     end
@@ -40,6 +49,63 @@
         end
     end
 
+    local function IWA_CRFM_UpdateShown()
+        if GetDisplayedAllyFrames() == nil then
+            CompactRaidFrameManager:Show()
+            CompactRaidFrameManager_UpdateOptionsFlowContainer(CompactRaidFrameManager)
+            CompactRaidFrameManager_UpdateContainerVisibility()
+        end
+    end
+
+    local function IWA_CRFM_UpdateOptionsFlowContainer()
+        if GetDisplayedAllyFrames() == nil then
+            local container = CompactRaidFrameManager.displayFrame.optionsFlowContainer;
+            FlowContainer_RemoveAllObjects(container)
+
+            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.profileSelector)
+            CompactRaidFrameManager.displayFrame.profileSelector:Show()
+
+            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.raidMarkers)
+            CompactRaidFrameManager.displayFrame.raidMarkers:Show()
+
+			FlowContainer_AddLineBreak(container);
+			FlowContainer_AddSpacer(container, 20);
+			FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.lockedModeToggle);
+			FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.hiddenModeToggle);
+			CompactRaidFrameManager.displayFrame.lockedModeToggle:Show();
+			CompactRaidFrameManager.displayFrame.hiddenModeToggle:Show();
+            CompactRaidFrameManager.displayFrame.leaderOptions:Hide();
+
+			FlowContainer_ResumeUpdates(container);
+
+			local usedX, usedY = FlowContainer_GetUsedBounds(container);
+			CompactRaidFrameManager:SetHeight(usedY + 40);
+        end
+    end
+
+    local function IWA_CRFM_UpdateContainerVisibility()
+        if GetDisplayedAllyFrames() == nil then
+            if not CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode then
+                CompactRaidFrameManager.container:Show()
+            else
+                CompactRaidFrameManager.container:Hide()
+            end
+        end
+    end
+
+    local function IWA_CRFM_UpdateContainerLockVisibility()
+        if GetDisplayedAllyFrames() == nil then
+            if not CompactRaidFrameManagerDisplayFrameLockedModeToggle.lockMode then
+                CompactRaidFrameManager_LockContainer(CompactRaidFrameManager)
+            end
+        end
+    end
+
+    hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
+    hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
+    hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
+    hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
+
     local function IWA_init()
         if IWalkAlone then
             IWA.conf = IWalkAlone
@@ -54,20 +120,12 @@
             IWA_hideManager()
         end
 
-        function GetDisplayedAllyFrames()
-          local daf = IWA.getDAF()
-          if daf == 'party' or not daf then
-            return 'raid'
-          else
-            return daf
-          end
-        end
 
         CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
 
         --These two may cause taint, I need to investigate this
-        CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
-        CompactRaidFrameManager.Hide = function() end
+        --CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
+        --CompactRaidFrameManager.Hide = function() end
 
         IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
     end
