@@ -54,6 +54,9 @@
             CompactRaidFrameManager:Show()
             CompactRaidFrameManager_UpdateOptionsFlowContainer(CompactRaidFrameManager)
             CompactRaidFrameManager_UpdateContainerVisibility()
+            if CompactPartyFrame then
+                CompactPartyFrame.title:SetText(SOLO)
+            end
         end
     end
 
