@@ -104,11 +104,6 @@
         end
     end
 
-    hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
-    hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
-    hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
-    hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
-
     local function IWA_init()
         if IWalkAlone then
             IWA.conf = IWalkAlone
@@ -123,12 +118,18 @@
             IWA_hideManager()
         end
 
-
         CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
 
-        --These two may cause taint, I need to investigate this
-        --CompactRaidFrameManager.RealHide = CompactRaidFrameManager.Hide
-        --CompactRaidFrameManager.Hide = function() end
+
+        --================================
+        --= Hooks, Secure and Otherwise
+        --================================
+        hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
+        hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
+        hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
+        hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
+
+        ----------------------------------
 
         IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
     end
@@ -166,51 +167,6 @@
     IWA.eventFrame:RegisterEvent("ADDON_LOADED")
 
     IWA.eventFrame:SetScript("OnEvent",eventHandler)
-
-----------------------------------
-
---================================
---= Hooks, Secure and Otherwise
---================================
-
---local function postHookCompactRaidFrameContainer_OnEvent(self,event,...)
---    if not UnitAffectingCombat("player") then
---        if ( event == "UNIT_PET" ) then
---            if ( self.displayPets ) then
---                local unit = ...;
---                if unit == "player" or strsub(unit, 1, 4) == "raid" or strsub(unit, 1, 5) == "party" then
---                    return
---                else
---                    print('Marqs Code Ran')
---                    CompactRaidFrameContainer_TryUpdate(self);
---                end
---            end
---        end
---    end
---end
---hooksecurefunc("CompactRaidFrameContainer_OnEvent",postHookCompactRaidFrameContainer_OnEvent)
-
---local CRFCOE = CompactRaidFrameContainer_OnEvent
---function CompactRaidFrameContainer_OnEvent(self, event, ...)
---    CRFCOE(self, event, ...)
---    if ( event == "UNIT_PET" ) then
---        if ( self.displayPets ) then
---            local unit = ...;
---            if ( unit == "player" or strsub(unit, 1, 4) == "raid" or strsub(unit, 1, 5) == "party" ) or UnitAffectingCombat("player") then
---                return
---            else
---                CompactRaidFrameContainer_TryUpdate(self);
---            end
---        end
---    end
---end
-
---CompactRaidFrameContainer:Show()
---CompactRaidFrameManager:Show()
-
-
---CompactRaidFrameContainer.RealHide = CompactRaidFrameContainer.Hide
---CompactRaidFrameContainer.Hide = function() end
 
 ----------------------------------
 
