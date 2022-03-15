@@ -54,9 +54,6 @@
             CompactRaidFrameManager:Show()
             CompactRaidFrameManager_UpdateOptionsFlowContainer(CompactRaidFrameManager)
             CompactRaidFrameManager_UpdateContainerVisibility()
-            if CompactPartyFrame then
-                CompactPartyFrame.title:SetText(SOLO)
-            end
         end
     end
 
@@ -104,6 +101,12 @@
         end
     end
 
+    local function IWA_CPF_OnLoad()
+        if GetDisplayedAllyFrames() == nil  and IWA_GetDisplayedAllyFrames() == 'raid' then
+            CompactPartyFrame.title:SetText(SOLO)
+        end
+    end
+
     local function IWA_init()
         if IWalkAlone then
             IWA.conf = IWalkAlone
@@ -118,9 +121,6 @@
             IWA_hideManager()
         end
 
-        CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
-
-
         --================================
         --= Hooks, Secure and Otherwise
         --================================
@@ -128,9 +128,11 @@
         hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
         hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
         hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
+        hooksecurefunc("CompactPartyFrame_OnLoad",IWA_CPF_OnLoad)
 
         ----------------------------------
 
+        CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
         IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
     end
 
