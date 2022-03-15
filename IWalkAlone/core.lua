@@ -4,6 +4,7 @@
     IWA = { -- main variable
         ['conf']            = {},
         ['eventFrame']      = CreateFrame("FRAME","IWA_EventFrame"),
+        ['spacerFrame']     = CreateFrame("FRAME","IWA_SpacerFrame"),
         ['events']          = {},
         ['getDAF']          = GetDisplayedAllyFrames,
     }
@@ -65,21 +66,33 @@
             FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.profileSelector)
             CompactRaidFrameManager.displayFrame.profileSelector:Show()
 
+            --Begin Magic Spacer #1
+            FlowContainer_AddLineBreak(container);
+            FlowContainer_AddSpacer(container, 20);
+            FlowContainer_AddObject(container, IWA.spacerFrame)
+            --End Magic Spacer #1
+
             FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.raidMarkers)
             CompactRaidFrameManager.displayFrame.raidMarkers:Show()
 
-			FlowContainer_AddLineBreak(container);
-			FlowContainer_AddSpacer(container, 20);
-			FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.lockedModeToggle);
-			FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.hiddenModeToggle);
-			CompactRaidFrameManager.displayFrame.lockedModeToggle:Show();
-			CompactRaidFrameManager.displayFrame.hiddenModeToggle:Show();
+            --Begin Magic Spacer #2
+            FlowContainer_AddLineBreak(container);
+            FlowContainer_AddSpacer(container, 20);
+            FlowContainer_AddObject(container, IWA.spacerFrame)
+            --End Magic Spacer #2
+
+            FlowContainer_AddLineBreak(container);
+            FlowContainer_AddSpacer(container, 20);
+            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.lockedModeToggle);
+            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.hiddenModeToggle);
+            CompactRaidFrameManager.displayFrame.lockedModeToggle:Show();
+            CompactRaidFrameManager.displayFrame.hiddenModeToggle:Show();
             CompactRaidFrameManager.displayFrame.leaderOptions:Hide();
 
-			FlowContainer_ResumeUpdates(container);
+            FlowContainer_ResumeUpdates(container);
 
-			local usedX, usedY = FlowContainer_GetUsedBounds(container);
-			CompactRaidFrameManager:SetHeight(usedY + 40);
+            local usedX, usedY = FlowContainer_GetUsedBounds(container);
+            CompactRaidFrameManager:SetHeight(usedY + 40);
         end
     end
 
@@ -120,6 +133,8 @@
         if IWA.conf.showManager == false and IWA.getDAF() == nil then
             IWA_hideManager()
         end
+
+        IWA.spacerFrame:SetHeight(10)
 
         --================================
         --= Hooks, Secure and Otherwise
