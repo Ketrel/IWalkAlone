@@ -3,9 +3,10 @@
 --================================
     IWA = { -- main variable
         ['conf']            = {},
-        ['eventFrame']      = CreateFrame("FRAME","IWA_EventFrame"),
-        ['spacerFrame']     = CreateFrame("FRAME","IWA_SpacerFrame"),
+        ['eventFrame']      = CreateFrame("FRAME","IWA:EventFrame"),
+        ['spacerFrame']     = CreateFrame("FRAME","IWA:SpacerFrame"),
         ['events']          = {},
+        ['combatQueue']     = {},
     }
     local db = {}
 
@@ -14,37 +15,42 @@
 --================================
 --= IWalkAlone Functions
 --================================
-    local function IWA_sync()
+    function IWA:sync()
         IWalkAlone = IWA.conf
     end
 
-    function IWA_hideManager()
+    function IWA:hideManager()
         CompactRaidFrameManager:SetAlpha(0)
         CompactRaidFrameManagerToggleButton:Hide()
     end
 
-    function IWA_showManager()
+    function IWA:showManager()
         CompactRaidFrameManager:SetAlpha(1)
         CompactRaidFrameManagerToggleButton:Show()
     end
 
-    local function IWA_toggleManager(msg, editBox, hc)
+    function IWA:toggleManager(msg, editBox, hc)
         if CompactRaidFrameManager:GetAlpha() < 1 then
             IWA.conf.showManager = true
-            IWA_showManager()
-            IWA_sync()
+            IWA:showManager()
+            IWA:sync()
         else
             IWA.conf.showManager = false
-            IWA_hideManager()
-            IWA_sync()
+            IWA:hideManager()
+            IWA:sync()
         end
     end
 
-    local function IWA_CRFM_UpdateOptionsFlowContainer()
+    function IWA:CRFM_UpdateOptionsFlowContainer()
         return true
     end
     
-    local function IWA_CPF_Title()
+    function IWA:CPF_Title()
+        if UnitAffectingCombat('player') then
+            IWA.combatQueue[IWA.CPF_Title] = true
+            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+            return;
+        end
         if IsInGroup() == false then 
             CompactPartyFrame.title:SetText(SOLO)
         elseif IsInGroup() and not IsInRaid() then
@@ -53,8 +59,9 @@
         --if in raid, let it do it's own thing for groups
     end
 
-    function IWA_CRFM_UpdateShown()
+    function IWA:CRFM_UpdateShown()
         if UnitAffectingCombat('player') then
+            IWA.combatQueue[IWA.CRFM_UpdateShown] = true
             IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
             return;
         end
@@ -65,8 +72,9 @@
         CompactRaidFrameManager_UpdateContainerVisibility();
     end
 
-    function IWA_CPF_UpdateVisibility()
+    function IWA:CPF_UpdateVisibility()
         if UnitAffectingCombat('player') then
+            IWA.combatQueue[IWA.CPF_UpdateVisibility] = true
             IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
             return;
         end
@@ -82,45 +90,56 @@
         PartyFrame:UpdatePaddingAndLayout();
     end
 
-    function IWA_CRFM_UpdateOptionsFlowContainer()
+    function IWA:CRFM_UpdateOptionsFlowContainer()
         if UnitAffectingCombat('player') then
+            IWA.combatQueue[IWA.CRFM_UpdateOptionsFlowContainer] = true
             IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
             return;
+        elseif IsInGroup() == true then
+            return;
         end
+
         local container = CompactRaidFrameManager.displayFrame.optionsFlowContainer
         FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.hiddenModeToggle)
+
         if GetCVarBool("raidOptionIsShown") then
             CompactRaidFrameManagerDisplayFrameHiddenModeToggle:SetText(HIDE)
         else
             CompactRaidFrameManagerDisplayFrameHiddenModeToggle:SetText(SHOW)
         end
+
         CompactRaidFrameManager.displayFrame.hiddenModeToggle:Show()
     end
 
-    function IWA_Reload()
-        IWA_CRFM_UpdateShown()
-        IWA_CPF_UpdateVisibility()
-        IWA_CRFM_UpdateOptionsFlowContainer()
-        IWA_CPF_Title()
+    function IWA:Reload()
+        IWA:CRFM_UpdateShown()
+        IWA:CPF_UpdateVisibility()
+        IWA:CRFM_UpdateOptionsFlowContainer()
+        IWA:CPF_Title()
     end
 
-    function IWA_CombatReload()
+    function IWA:CombatReload()
         IWA.eventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
-        IWA_Reload() 
+        for func,act in pairs(IWA.combatQueue) do
+            if act == true then
+                IWA.combatQueue[func] = false
+                func(IWA)
+            end
+        end
     end
 
-    local function IWA_init()
+    function IWA:init()
         if IWalkAlone then
             IWA.conf = IWalkAlone
         else
             IWA.conf = {
                 ["showManager"] = true,
             }
-            IWA_sync()
+            IWA:sync()
         end
 
         if IWA.conf.showManager == false and IsInGroup() == false then
-            IWA_hideManager()
+            IWA:hideManager()
         end
 
         IWA.spacerFrame:SetHeight(10)
@@ -128,12 +147,12 @@
         --================================
         --= Hooks, Secure and Otherwise
         --================================
-        hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
-        hooksecurefunc("CompactPartyFrame_UpdateVisibility", IWA_CPF_UpdateVisibility)
-        hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
+        hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA.CRFM_UpdateShown)
+        hooksecurefunc("CompactPartyFrame_UpdateVisibility", IWA.CPF_UpdateVisibility)
+        hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA.CRFM_UpdateOptionsFlowContainer)
         ----------------------------------
 
-        IWA_CPF_Title()
+        IWA:CPF_Title()
 
         CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
         IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
@@ -147,29 +166,29 @@
     local events = {}
 
     function events:GROUP_JOINED()
-        IWA_showManager()
-        IWA_CPF_Title()
+        IWA:showManager()
+        IWA:CPF_Title()
     end
 
     function events:GROUP_LEFT()
         if not IWA.conf.showManager then
-            IWA_hideManager()
+            IWA:hideManager()
         end
-        IWA_CPF_Title()
+        IWA:CPF_Title()
     end
 
     function events:ADDON_LOADED(...)
         event, arg1 = ...
         if arg1 == "IWalkAlone" then
-            IWA_init()
+            IWA:init()
         end
     end
 
     function events:PLAYER_REGEN_ENABLED()
-        IWA_CombatReload()
+        IWA:CombatReload()
     end
 
-    local function eventHandler(self,event,...)
+    function eventHandler(self,event,...)
         events[event](self,event,...)
     end
 
@@ -184,7 +203,7 @@
 --================================
 --= Slash Commands
 --================================
-    SlashCmdList["TOGGLEMANAGER"] = IWA_toggleManager
+    SlashCmdList["TOGGLEMANAGER"] = IWA.toggleManager
     SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/iwa', '/toggleraidman', '/raidman'
-    SlashCmdList["RELOADIWA"] = IWA_Reload()
+    SlashCmdList["RELOADIWA"] = IWA.Reload
     SLASH_RELOADIWA1, SLASH_RELOADIWA2= "/reloadiwa", "/iwareload"
