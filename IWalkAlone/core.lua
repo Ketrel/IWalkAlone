@@ -188,6 +188,12 @@
         IWA:CombatReload()
     end
 
+    function events:PLAYER_LOGIN()
+        if EditModeManagerFrame:UseRaidStylePartyFrames() == false then
+            DEFAULT_CHAT_FRAME:AddMessage("\n***I Walk Alone***\n   I Walk Alone needs 'Use Raid Style Party Frames'\n    enabled to function properly",1,0,0)
+        end
+    end
+
     function eventHandler(self,event,...)
         events[event](self,event,...)
     end
@@ -195,6 +201,7 @@
     IWA.eventFrame:RegisterEvent("GROUP_JOINED")
     IWA.eventFrame:RegisterEvent("GROUP_LEFT")
     IWA.eventFrame:RegisterEvent("ADDON_LOADED")
+    IWA.eventFrame:RegisterEvent("PLAYER_LOGIN")
 
     IWA.eventFrame:SetScript("OnEvent",eventHandler)
 
