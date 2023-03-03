@@ -3,8 +3,8 @@
 --================================
     IWA = { -- main variable
         ['conf']            = {},
-        ['eventFrame']      = CreateFrame("FRAME","IWA:EventFrame"),
-        ['spacerFrame']     = CreateFrame("FRAME","IWA:SpacerFrame"),
+        ['eventFrame']      = CreateFrame("FRAME","EventFrame"),
+        ['spacerFrame']     = CreateFrame("FRAME","SpacerFrame"),
         ['events']          = {},
         ['combatQueue']     = {},
     }
