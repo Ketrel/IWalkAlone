@@ -180,4 +180,4 @@
     SlashCmdList["TOGGLEMANAGER"] = IWA_toggleManager
     SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/iwa', '/toggleraidman', '/raidman'
     SlashCmdList["RELOADIWA"] = IWA_Reload()
-    SLASH_RELOADIWA1 = "/reloadiwa"
+    SLASH_RELOADIWA1, SLASH_RELOADIWA2= "/reloadiwa", "/iwareload"
