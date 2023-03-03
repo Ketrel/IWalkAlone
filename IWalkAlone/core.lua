@@ -58,7 +58,11 @@
         end
     end
 
-    function CompactRaidFrameManager_UpdateShown()
+    function IWA_CRFM_UpdateShown()
+        if UnitAffectingCombat('player') then
+            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+            return;
+        end
         local showManager = true or EditModeManagerFrame:AreRaidFramesForcedShown() or EditModeManagerFrame:ArePartyFramesForcedShown();
         CompactRaidFrameManager:SetShown(showManager);
 
@@ -66,7 +70,11 @@
         CompactRaidFrameManager_UpdateContainerVisibility();
     end
 
-    function CompactPartyFrame_UpdateVisibility()
+    function IWA_CPF_UpdateVisibility()
+        if UnitAffectingCombat('player') then
+            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+            return;
+        end
         if not CompactPartyFrame then
             return;
         end
@@ -76,6 +84,16 @@
         local showCompactPartyFrame = groupFramesShown and EditModeManagerFrame:UseRaidStylePartyFrames();
         CompactPartyFrame:SetShown(showCompactPartyFrame);
         PartyFrame:UpdatePaddingAndLayout();
+    end
+
+    function IWA_Reload()
+        IWA_CRFM_UpdateShown()
+        IWA_CPF_UpdateVisibility()
+    end
+
+    function IWA_CombatReload()
+        IWA_Reload() 
+        IWA.eventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
     end
 
     local function IWA_init()
@@ -103,6 +121,9 @@
         --hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
         --hooksecurefunc("CompactPartyFrame_OnLoad",IWA_CPF_OnLoad)
 
+
+        hooksecurefunc("CompactRaidFrameManager_UpdateShown",           IWA_CRFM_UpdateShown)
+        hooksecurefunc("CompactPartyFrame_UpdateVisibility",            IWA_CPF_UpdateVisibility)
         ----------------------------------
 
         IWA_CPF_Title()
@@ -137,6 +158,10 @@
         end
     end
 
+    function events:PLAYER_REGEN_ENABLED()
+        IWA_CombatReload()
+    end
+
     local function eventHandler(self,event,...)
         events[event](self,event,...)
     end
@@ -154,3 +179,5 @@
 --================================
     SlashCmdList["TOGGLEMANAGER"] = IWA_toggleManager
     SLASH_TOGGLEMANAGER1, SLASH_TOGGLEMANAGER2, SLASH_TOGGGLEMANAGER3 = '/iwa', '/toggleraidman', '/raidman'
+    SlashCmdList["RELOADIWA"] = IWA_Reload()
+    SLASH_RELOADIWA1 = "/reloadiwa"
