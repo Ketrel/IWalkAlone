@@ -6,7 +6,8 @@
         ['eventFrame']      = CreateFrame("FRAME","IWA_EventFrame"),
         ['spacerFrame']     = CreateFrame("FRAME","IWA_SpacerFrame"),
         ['events']          = {},
-        ['getDAF']          = GetDisplayedAllyFrames,
+        ['CPF_UV']          = CompactPartyFrame_UpdateVisibility,
+        ['CRFM_US']         = CompactRaidFrameManager_UpdateShown,
     }
     local db = {}
 
@@ -15,15 +16,6 @@
 --================================
 --= IWalkAlone Functions
 --================================
-    local function IWA_GetDisplayedAllyFrames()
-        local daf = GetDisplayedAllyFrames()
-        if daf == 'party' or not daf then
-            return 'raid'
-        else
-            return daf
-        end
-    end
-
     local function IWA_sync()
         IWalkAlone = IWA.conf
     end
@@ -50,74 +42,40 @@
         end
     end
 
-    local function IWA_CRFM_UpdateShown()
-        if GetDisplayedAllyFrames() == nil then
-            CompactRaidFrameManager:Show()
-            CompactRaidFrameManager_UpdateOptionsFlowContainer(CompactRaidFrameManager)
-            CompactRaidFrameManager_UpdateContainerVisibility()
-        end
-    end
-
     local function IWA_CRFM_UpdateOptionsFlowContainer()
-        if GetDisplayedAllyFrames() == nil then
-            local container = CompactRaidFrameManager.displayFrame.optionsFlowContainer;
-            FlowContainer_RemoveAllObjects(container)
-
-            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.profileSelector)
-            CompactRaidFrameManager.displayFrame.profileSelector:Show()
-
-            --Begin Magic Spacer #1
-            FlowContainer_AddLineBreak(container);
-            FlowContainer_AddSpacer(container, 20);
-            FlowContainer_AddObject(container, IWA.spacerFrame)
-            --End Magic Spacer #1
-
-            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.raidMarkers)
-            CompactRaidFrameManager.displayFrame.raidMarkers:Show()
-
-            --Begin Magic Spacer #2
-            FlowContainer_AddLineBreak(container);
-            FlowContainer_AddSpacer(container, 20);
-            FlowContainer_AddObject(container, IWA.spacerFrame)
-            --End Magic Spacer #2
-
-            FlowContainer_AddLineBreak(container);
-            FlowContainer_AddSpacer(container, 20);
-            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.lockedModeToggle);
-            FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.hiddenModeToggle);
-            CompactRaidFrameManager.displayFrame.lockedModeToggle:Show();
-            CompactRaidFrameManager.displayFrame.hiddenModeToggle:Show();
-            CompactRaidFrameManager.displayFrame.leaderOptions:Hide();
-
-            FlowContainer_ResumeUpdates(container);
-
-            local usedX, usedY = FlowContainer_GetUsedBounds(container);
-            CompactRaidFrameManager:SetHeight(usedY + 40);
-        end
+        return true
     end
-
-    local function IWA_CRFM_UpdateContainerVisibility()
-        if GetDisplayedAllyFrames() == nil then
-            if not CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode then
-                CompactRaidFrameManager.container:Show()
-            else
-                CompactRaidFrameManager.container:Hide()
-            end
-        end
-    end
-
-    local function IWA_CRFM_UpdateContainerLockVisibility()
-        if GetDisplayedAllyFrames() == nil then
-            if not CompactRaidFrameManagerDisplayFrameLockedModeToggle.lockMode then
-                CompactRaidFrameManager_LockContainer(CompactRaidFrameManager)
-            end
-        end
-    end
-
+    
     local function IWA_CPF_OnLoad()
-        if GetDisplayedAllyFrames() == nil  and IWA_GetDisplayedAllyFrames() == 'raid' then
+        IWA_CPF_Title()
+    end
+
+    local function IWA_CPF_Title()
+        if IsInGroup() == false then 
             CompactPartyFrame.title:SetText(SOLO)
+        elseif IsInGroup() and not IsInRaid() then
+            CompactPartyFrame.title:SetText(PARTY)
         end
+    end
+
+    function CompactRaidFrameManager_UpdateShown()
+        local showManager = true or EditModeManagerFrame:AreRaidFramesForcedShown() or EditModeManagerFrame:ArePartyFramesForcedShown();
+        CompactRaidFrameManager:SetShown(showManager);
+
+        CompactRaidFrameManager_UpdateOptionsFlowContainer();
+        CompactRaidFrameManager_UpdateContainerVisibility();
+    end
+
+    function CompactPartyFrame_UpdateVisibility()
+        if not CompactPartyFrame then
+            return;
+        end
+
+        local isInArena = IsActiveBattlefieldArena();
+        local groupFramesShown = (true and (isInArena or not IsInRaid())) or EditModeManagerFrame:ArePartyFramesForcedShown();
+        local showCompactPartyFrame = groupFramesShown and EditModeManagerFrame:UseRaidStylePartyFrames();
+        CompactPartyFrame:SetShown(showCompactPartyFrame);
+        PartyFrame:UpdatePaddingAndLayout();
     end
 
     local function IWA_init()
@@ -130,7 +88,7 @@
             IWA_sync()
         end
 
-        if IWA.conf.showManager == false and IWA.getDAF() == nil then
+        if IWA.conf.showManager == false and IsInGroup() == false then
             IWA_hideManager()
         end
 
@@ -139,13 +97,15 @@
         --================================
         --= Hooks, Secure and Otherwise
         --================================
-        hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
-        hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
-        hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
-        hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
-        hooksecurefunc("CompactPartyFrame_OnLoad",IWA_CPF_OnLoad)
+        --hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
+        --hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
+        --hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
+        --hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
+        --hooksecurefunc("CompactPartyFrame_OnLoad",IWA_CPF_OnLoad)
 
         ----------------------------------
+
+        IWA_CPF_Title()
 
         CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
         IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
@@ -160,12 +120,14 @@
 
     function events:GROUP_JOINED()
         IWA_showManager()
+        IWA_CPF_Title()
     end
 
     function events:GROUP_LEFT()
         if not IWA.conf.showManager then
             IWA_hideManager()
         end
+        IWA_CPF_Title()
     end
 
     function events:ADDON_LOADED(...)
