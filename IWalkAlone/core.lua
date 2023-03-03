@@ -44,10 +44,6 @@
         return true
     end
     
-    local function IWA_CPF_OnLoad()
-        IWA_CPF_Title()
-    end
-
     local function IWA_CPF_Title()
         if IsInGroup() == false then 
             CompactPartyFrame.title:SetText(SOLO)
@@ -132,13 +128,6 @@
         --================================
         --= Hooks, Secure and Otherwise
         --================================
-        --hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
-        --hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
-        --hooksecurefunc("CompactRaidFrameManager_UpdateContainerVisibility", IWA_CRFM_UpdateContainerVisibility)
-        --hooksecurefunc("CompactRaidFrameManager_UpdateContainerLockVisibility", IWA_CRFM_UpdateContainerLockVisibility)
-        --hooksecurefunc("CompactPartyFrame_OnLoad",IWA_CPF_OnLoad)
-
-
         hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
         hooksecurefunc("CompactPartyFrame_UpdateVisibility", IWA_CPF_UpdateVisibility)
         hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
