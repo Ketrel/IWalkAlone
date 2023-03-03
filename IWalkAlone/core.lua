@@ -56,6 +56,7 @@
         elseif IsInGroup() and not IsInRaid() then
             CompactPartyFrame.title:SetText(PARTY)
         end
+        --if in raid, let it do it's own thing for groups
     end
 
     function IWA_CRFM_UpdateShown()
