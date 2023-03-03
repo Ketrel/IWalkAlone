@@ -6,8 +6,6 @@
         ['eventFrame']      = CreateFrame("FRAME","IWA_EventFrame"),
         ['spacerFrame']     = CreateFrame("FRAME","IWA_SpacerFrame"),
         ['events']          = {},
-        ['CPF_UV']          = CompactPartyFrame_UpdateVisibility,
-        ['CRFM_US']         = CompactRaidFrameManager_UpdateShown,
     }
     local db = {}
 
@@ -81,15 +79,32 @@
         end
 
         local isInArena = IsActiveBattlefieldArena();
-        local groupFramesShown = (true and (isInArena or not IsInRaid())) or EditModeManagerFrame:ArePartyFramesForcedShown();
+        --local groupFramesShown = (true and (isInArena or not IsInRaid())) or EditModeManagerFrame:ArePartyFramesForcedShown();
+        local groupFramesShown = GetCVarBool("raidOptionIsShown") and (true and (isInArena or not IsInRaid())) or EditModeManagerFrame:ArePartyFramesForcedShown();
         local showCompactPartyFrame = groupFramesShown and EditModeManagerFrame:UseRaidStylePartyFrames();
         CompactPartyFrame:SetShown(showCompactPartyFrame);
         PartyFrame:UpdatePaddingAndLayout();
     end
 
+    function IWA_CRFM_UpdateOptionsFlowContainer()
+        if UnitAffectingCombat('player') then
+            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+            return;
+        end
+        local container = CompactRaidFrameManager.displayFrame.optionsFlowContainer
+        FlowContainer_AddObject(container, CompactRaidFrameManager.displayFrame.hiddenModeToggle)
+        if GetCVarBool("raidOptionIsShown") then
+            CompactRaidFrameManagerDisplayFrameHiddenModeToggle:SetText(HIDE)
+        else
+            CompactRaidFrameManagerDisplayFrameHiddenModeToggle:SetText(SHOW)
+        end
+        CompactRaidFrameManager.displayFrame.hiddenModeToggle:Show()
+    end
+
     function IWA_Reload()
         IWA_CRFM_UpdateShown()
         IWA_CPF_UpdateVisibility()
+        IWA_CRFM_UpdateOptionsFlowContainer()
         IWA_CPF_Title()
     end
 
@@ -124,8 +139,9 @@
         --hooksecurefunc("CompactPartyFrame_OnLoad",IWA_CPF_OnLoad)
 
 
-        hooksecurefunc("CompactRaidFrameManager_UpdateShown",           IWA_CRFM_UpdateShown)
-        hooksecurefunc("CompactPartyFrame_UpdateVisibility",            IWA_CPF_UpdateVisibility)
+        hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA_CRFM_UpdateShown)
+        hooksecurefunc("CompactPartyFrame_UpdateVisibility", IWA_CPF_UpdateVisibility)
+        hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA_CRFM_UpdateOptionsFlowContainer)
         ----------------------------------
 
         IWA_CPF_Title()
