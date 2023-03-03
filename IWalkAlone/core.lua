@@ -89,11 +89,12 @@
     function IWA_Reload()
         IWA_CRFM_UpdateShown()
         IWA_CPF_UpdateVisibility()
+        IWA_CPF_Title()
     end
 
     function IWA_CombatReload()
-        IWA_Reload() 
         IWA.eventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
+        IWA_Reload() 
     end
 
     local function IWA_init()
