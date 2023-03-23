@@ -1,4 +1,4 @@
-## Interface: 100005
+## Interface: 100007
 ## Title: I Walk Alone
 ## Author: Marq
 ## Version: 3.0.0
