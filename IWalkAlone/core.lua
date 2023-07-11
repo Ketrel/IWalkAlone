@@ -82,12 +82,8 @@
             return;
         end
 
-        local isInArena = IsActiveBattlefieldArena();
-        --local groupFramesShown = (true and (isInArena or not IsInRaid())) or EditModeManagerFrame:ArePartyFramesForcedShown();
-        local groupFramesShown = GetCVarBool("raidOptionIsShown") and (true and (isInArena or not IsInRaid())) or EditModeManagerFrame:ArePartyFramesForcedShown();
-        local showCompactPartyFrame = groupFramesShown and EditModeManagerFrame:UseRaidStylePartyFrames();
-        CompactPartyFrame:SetShown(showCompactPartyFrame);
-        PartyFrame:UpdatePaddingAndLayout();
+        self:SetShown(true)
+        PartyFrame:UpdatePaddingAndLayout()
     end
 
     function IWA:CRFM_UpdateOptionsFlowContainer()
@@ -148,7 +144,7 @@
         --= Hooks, Secure and Otherwise
         --================================
         hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA.CRFM_UpdateShown)
-        hooksecurefunc("CompactPartyFrame_UpdateVisibility", IWA.CPF_UpdateVisibility)
+        hooksecurefunc(CompactPartyFrame, "UpdateVisibility", IWA.CPF_UpdateVisibility)
         hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA.CRFM_UpdateOptionsFlowContainer)
         ----------------------------------
 
