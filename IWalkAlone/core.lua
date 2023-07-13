@@ -91,7 +91,7 @@
             IWA.combatQueue[IWA.CRFM_UpdateOptionsFlowContainer] = true
             IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
             return;
-        elseif IsInGroup() == true then
+        elseif IsInGroup() == true or IsInRaid() == true then
             return;
         end
 
