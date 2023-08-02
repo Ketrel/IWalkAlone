@@ -60,13 +60,10 @@
     end
     
     function IWA:CPF_Title()
-        --if UnitAffectingCombat('player') then
-        --    IWA.combatQueue[IWA.CPF_Title] = true
-        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         if IWA:queueIfCombat(IWA.CPF_Title) then
             return
+        --if in raid, let it do it's own thing for groups
         elseif IsInRaid() then
-            --if in raid, let it do it's own thing for groups
             return
         end
         if IsInGroup() == false then 
@@ -79,9 +76,6 @@
     function IWA:CRFM_UpdateShown()
         if IWA.IsGrouped() then
             return
-        --elseif UnitAffectingCombat('player') then
-        --    IWA.combatQueue[IWA.CRFM_UpdateShown] = true
-        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         elseif IWA:queueIfCombat(IWA.CRFM_UpdateShown) then
             return
         end
@@ -95,9 +89,6 @@
     function IWA:CPF_UpdateVisibility()
         if IWA.IsGrouped() then
             return
-        --elseif UnitAffectingCombat('player') then
-        --    IWA.combatQueue[IWA.CPF_UpdateVisibility] = true
-        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         elseif IWA:queueIfCombat(IWA.CPF_UpdateVisibility) then
             return
         elseif not CompactPartyFrame then
@@ -111,9 +102,6 @@
     function IWA:CRFM_UpdateOptionsFlowContainer()
         if IWA.IsGrouped() then
             return
-        --elseif UnitAffectingCombat('player') then
-        --    IWA.combatQueue[IWA.CRFM_UpdateOptionsFlowContainer] = true
-        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         elseif IWA:queueIfCombat(IWA.CRFM_UpdateOptionsFlowContainer) then
             return
         end
