@@ -95,7 +95,12 @@
             return
         end
 
-        CompactPartyFrame:SetShown(true)
+        if GetCVarBool("raidOptionIsShown") then
+            CompactPartyFrame:SetShown(true)
+        else
+            CompactPartyFrame:SetShown(false)
+        end
+
         PartyFrame:UpdatePaddingAndLayout()
     end
 
