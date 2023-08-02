@@ -41,29 +41,49 @@
         end
     end
 
+    function IWA:IsGrouped()
+        return (IsInGroup() == true or IsInRaid() == true)
+    end
+
+    function IWA:queueIfCombat(func)
+        if UnitAffectingCombat('player') then
+            IWA.combatQueue[func] = true
+            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+            return true
+        else
+            return false
+        end
+    end
+
     function IWA:CRFM_UpdateOptionsFlowContainer()
         return true
     end
     
     function IWA:CPF_Title()
-        if UnitAffectingCombat('player') then
-            IWA.combatQueue[IWA.CPF_Title] = true
-            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-            return;
+        --if UnitAffectingCombat('player') then
+        --    IWA.combatQueue[IWA.CPF_Title] = true
+        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+        if IWA:queueIfCombat(IWA.CPF_Title) then
+            return
+        elseif IsInRaid() then
+            --if in raid, let it do it's own thing for groups
+            return
         end
         if IsInGroup() == false then 
             CompactPartyFrame.title:SetText(SOLO)
-        elseif IsInGroup() and not IsInRaid() then
+        elseif IsInGroup() then
             CompactPartyFrame.title:SetText(PARTY)
         end
-        --if in raid, let it do it's own thing for groups
     end
 
     function IWA:CRFM_UpdateShown()
-        if UnitAffectingCombat('player') then
-            IWA.combatQueue[IWA.CRFM_UpdateShown] = true
-            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-            return;
+        if IWA.IsGrouped() then
+            return
+        --elseif UnitAffectingCombat('player') then
+        --    IWA.combatQueue[IWA.CRFM_UpdateShown] = true
+        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+        elseif IWA:queueIfCombat(IWA.CRFM_UpdateShown) then
+            return
         end
         local showManager = true or EditModeManagerFrame:AreRaidFramesForcedShown() or EditModeManagerFrame:ArePartyFramesForcedShown();
         CompactRaidFrameManager:SetShown(showManager);
@@ -73,26 +93,29 @@
     end
 
     function IWA:CPF_UpdateVisibility()
-        if UnitAffectingCombat('player') then
-            IWA.combatQueue[IWA.CPF_UpdateVisibility] = true
-            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-            return;
-        end
-        if not CompactPartyFrame then
-            return;
+        if IWA.IsGrouped() then
+            return
+        --elseif UnitAffectingCombat('player') then
+        --    IWA.combatQueue[IWA.CPF_UpdateVisibility] = true
+        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+        elseif IWA:queueIfCombat(IWA.CPF_UpdateVisibility) then
+            return
+        elseif not CompactPartyFrame then
+            return
         end
 
-        self:SetShown(true)
+        CompactPartyFrame:SetShown(true)
         PartyFrame:UpdatePaddingAndLayout()
     end
 
     function IWA:CRFM_UpdateOptionsFlowContainer()
-        if UnitAffectingCombat('player') then
-            IWA.combatQueue[IWA.CRFM_UpdateOptionsFlowContainer] = true
-            IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-            return;
-        elseif IsInGroup() == true or IsInRaid() == true then
-            return;
+        if IWA.IsGrouped() then
+            return
+        --elseif UnitAffectingCombat('player') then
+        --    IWA.combatQueue[IWA.CRFM_UpdateOptionsFlowContainer] = true
+        --    IWA.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+        elseif IWA:queueIfCombat(IWA.CRFM_UpdateOptionsFlowContainer) then
+            return
         end
 
         local container = CompactRaidFrameManager.displayFrame.optionsFlowContainer
