@@ -2,6 +2,8 @@
 --== Basic Addon Setup
 --================================
     IWA = { -- main variable
+        ['initialized']     = false,
+        ['doInit']          = false,
         ['conf']            = {},
         ['eventFrame']      = CreateFrame("FRAME","EventFrame"),
         ['spacerFrame']     = CreateFrame("FRAME","SpacerFrame"),
@@ -141,6 +143,10 @@
     end
 
     function IWA:init()
+        if IWA.doInit == false or IWA.initialized == true then
+            return
+        end
+
         if IWalkAlone then
             IWA.conf = IWalkAlone
         else
@@ -167,7 +173,7 @@
         IWA:CPF_Title()
 
         CompactRaidFrameContainer:SetIgnoreParentAlpha(1)
-        IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
+        IWA.initialized = true
     end
 
 ----------------------------------
@@ -192,7 +198,8 @@
     function events:ADDON_LOADED(...)
         event, arg1 = ...
         if arg1 == "IWalkAlone" then
-            IWA:init()
+            IWA.doInit = true
+            IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
         end
     end
 
@@ -203,7 +210,13 @@
     function events:PLAYER_LOGIN()
         if EditModeManagerFrame:UseRaidStylePartyFrames() == false then
             DEFAULT_CHAT_FRAME:AddMessage("\n***I Walk Alone***\n   I Walk Alone needs 'Use Raid Style Party Frames'\n    enabled to function properly",1,0,0)
+            IWA.eventFrame:UnregisterEvent("GROUP_JOINED")
+            IWA.eventFrame:UnregisterEvent("GROUP_LEFT")
+            IWA.eventFrame:UnregisterEvent("ADDON_LOADED")
+            IWA.eventFrame:UnregisterEvent("PLAYER_LOGIN")
+            IWA.doInit = false
         end
+        IWA:init()
     end
 
     function eventHandler(self,event,...)
