@@ -23,12 +23,12 @@
 
     function IWA:hideManager()
         CompactRaidFrameManager:SetAlpha(0)
-        CompactRaidFrameManagerToggleButton:Hide()
+        --CompactRaidFrameManagerToggleButton:Hide()
     end
 
     function IWA:showManager()
         CompactRaidFrameManager:SetAlpha(1)
-        CompactRaidFrameManagerToggleButton:Show()
+        --CompactRaidFrameManagerToggleButton:Show()
     end
 
     function IWA:toggleManager(msg, editBox, hc)
