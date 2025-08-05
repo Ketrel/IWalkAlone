@@ -128,7 +128,7 @@
     function IWA:Reload()
         IWA:CRFM_UpdateShown()
         IWA:CPF_UpdateVisibility()
-        IWA:CRFM_UpdateOptionsFlowContainer()
+        --IWA:CRFM_UpdateOptionsFlowContainer()
         IWA:CPF_Title()
     end
 
@@ -167,7 +167,7 @@
         --================================
         hooksecurefunc("CompactRaidFrameManager_UpdateShown", IWA.CRFM_UpdateShown)
         hooksecurefunc(CompactPartyFrame, "UpdateVisibility", IWA.CPF_UpdateVisibility)
-        hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA.CRFM_UpdateOptionsFlowContainer)
+        --hooksecurefunc("CompactRaidFrameManager_UpdateOptionsFlowContainer", IWA.CRFM_UpdateOptionsFlowContainer)
         ----------------------------------
 
         IWA:CPF_Title()
