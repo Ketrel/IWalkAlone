@@ -1,6 +1,6 @@
-## Interface: 120000,120001
+## Interface: 120105
 ## Title: I Walk Alone
 ## Author: Marq
-## Version: 5.0.0
+## Version: 5.15.0
 ## SavedVariablesPerCharacter: IWalkAlone
 core.lua
